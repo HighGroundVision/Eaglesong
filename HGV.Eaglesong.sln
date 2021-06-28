@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30907.101
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HGV.Eaglesong", "HGV.Eaglesong\HGV.Eaglesong.csproj", "{4638C64A-4F30-4B9B-847B-031FDCCAF80F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HGV.Eaglesong", "src\HGV.Eaglesong.csproj", "{4638C64A-4F30-4B9B-847B-031FDCCAF80F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

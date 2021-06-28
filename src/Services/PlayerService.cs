@@ -62,7 +62,6 @@ namespace HGV.Eaglesong.Services
 
         public async Task<List<PlayerHistory>> GetHistory(int accountId)
         {
-            var steamId = ConvertId(accountId);
             var history = await DotaHistory(accountId);
             var collection = new List<PlayerHistory>();
 
