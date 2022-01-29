@@ -19,12 +19,6 @@ namespace HGV.Eaglesong.Models
         [JsonProperty("victory")]
         public bool Victory { get; set; } 
 
-        //[JsonProperty("steam_id")]
-        //public ulong SteamId { get; set; } 
-
-        //[JsonProperty("account_id")]
-        //public int AccountId { get; set; }
-
         [JsonProperty("hero")]
         public int Hero { get; set; } 
 

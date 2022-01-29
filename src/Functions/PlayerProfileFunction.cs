@@ -1,23 +1,13 @@
-using System;
-using System.Linq;
-using System.IO;
-using System.Threading.Tasks;
+using HGV.Eaglesong.Dto;
+using HGV.Eaglesong.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using HGV.Daedalus;
-using Polly.Registry;
-using Polly;
-using System.Net.Http;
-using HGV.Eaglesong.Models;
-using System.Collections.Generic;
-using HGV.Eaglesong.Services;
-using Microsoft.Extensions.Caching.Distributed;
 using Polly.Caching;
-using HGV.Eaglesong.Dto;
+using System;
+using System.Threading.Tasks;
 
 namespace HGV.Eaglesong
 {
@@ -34,57 +24,119 @@ namespace HGV.Eaglesong
             this.detailsCache = detailsCache;
         }
 
+        [FunctionName("CheckIdentity")]
+        public async Task<IActionResult> Check(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "check/{identity}")] HttpRequest req,
+            string identity,
+            ILogger log)
+        {
+            var id = new Models.SteamID();
+
+            identity = identity.Trim();
+
+            if (identity.StartsWith("https://windrun.io/players/"))
+            {
+                var value = identity.Replace("https://windrun.io/players/", "");
+                var accountId = uint.Parse(value);
+                id.Set(accountId, Models.EUniverse.Public, Models.EAccountType.Individual);
+            }
+            else if (identity.StartsWith("https://www.opendota.com/players/"))
+            {
+                var value = identity.Replace("https://www.opendota.com/players/", "");
+                var accountId = uint.Parse(value);
+                id.Set(accountId, Models.EUniverse.Public, Models.EAccountType.Individual);
+            }
+            else if (identity.StartsWith("https://dotabuff.com/players/"))
+            {
+                var value = identity.Replace("https://dotabuff.com/players/", "");
+                var accountId = uint.Parse(value);
+                id.Set(accountId, Models.EUniverse.Public, Models.EAccountType.Individual);
+            }
+            else if (identity.StartsWith("https://steamcommunity.com/profiles/"))
+            {
+                var value = identity.Replace("https://steamcommunity.com/profiles/", "");
+                var steamId = ulong.Parse(value);
+                id.SetFromUInt64(steamId);
+            }
+            else if (id.SetFromString(identity, Models.EUniverse.Public))
+            {
+                // parsed "STEAM_" into SteamID.
+            }
+            else if (id.SetFromSteam3String(identity))
+            {
+                // parsed "[X:1:2:3]" into SteamID.
+            }
+            else if (uint.TryParse(identity, out uint accountId))
+            {
+                id.Set(accountId, Models.EUniverse.Public, Models.EAccountType.Individual);
+            }
+            else if (ulong.TryParse(identity, out ulong steamId))
+            {
+                id.SetFromUInt64(steamId);
+            }
+            else
+            {
+                return new NotFoundResult();
+            }
+
+            var dto = new Check()
+            {
+                AccountId = id.AccountID,
+                SteamId = id.ConvertToUInt64(),
+            };
+            return new OkObjectResult(dto);
+        }
+
         [FunctionName("PlayerProfile")]
         public async Task<IActionResult> Profile(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "profile/{account}")] HttpRequest req,
-            int account,
+            uint account,
             ILogger log)
         {
             var item = await this.profileCache.TryGetAsync($"PlayerProfileFunction.Profile.{account}", default, false);
             if(item.Item1)
-            {
                 return new OkObjectResult(item.Item2);
-            }
-            else
+
+            var data = await this.service.GetProfile(account);
+            if (data is null)
+                return new NotFoundResult();
+
+            var dto = new Profile()
             {
-                var data = await this.service.GetProfile(account);
-                var dto = new Profile()
-                {
-                    SteamId = data.SteamId,
-                    AccountId = account,
-                    Persona = data.Persona,
-                    Avatar = data.AvatarLarge,
-                };
-                var ttl = new Ttl(TimeSpan.FromMinutes(60));
-                await this.profileCache.PutAsync($"PlayerProfileFunction.Profile.{account}", dto, ttl, default, false);
-                return new OkObjectResult(dto);
-            }
+                AccountId = account,
+                Persona = data.Persona,
+                Avatar = data.Avatar,
+            };
+            var ttl = new Ttl(TimeSpan.FromMinutes(60));
+            await this.profileCache.PutAsync($"PlayerProfileFunction.Profile.{account}", dto, ttl, default, false);
+
+            return new OkObjectResult(dto);
         }
 
         [FunctionName("PlayerDetails")]
         public async Task<IActionResult> Details(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "details/{account}")] HttpRequest req,
-            int account,
+            uint account,
             ILogger log)
         {
             var item = await this.detailsCache.TryGetAsync($"PlayerProfileFunction.Details.{account}", default, false);
             if(item.Item1)
-            {
                 return new OkObjectResult(item.Item2);
-            }
-            else
+
+            var profile = await this.service.GetProfile(account);
+            if (profile is null)
+                return new NotFoundResult();
+
+            var history = await this.service.GetHistory(account);
+            var dto = new Details()
             {
-                var summary = await this.service.GetSummary(account);
-                var history = await this.service.GetHistory(account);
-                var dto = new Details() 
-                { 
-                    Summary = summary, 
-                    History = history
-                };
-                var ttl = new Ttl(TimeSpan.FromMinutes(60));
-                await this.detailsCache.PutAsync($"PlayerProfileFunction.Details.{account}", dto, ttl, default, false);
-                return new OkObjectResult(dto);
-            }
+                Summary = profile,
+                History = history
+            };
+            var ttl = new Ttl(TimeSpan.FromMinutes(60));
+            await this.detailsCache.PutAsync($"PlayerProfileFunction.Details.{account}", dto, ttl, default, false);
+
+            return new OkObjectResult(dto);
         }
     }
 }

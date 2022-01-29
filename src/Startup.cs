@@ -1,5 +1,4 @@
-﻿using HGV.Daedalus;
-using HGV.Eaglesong;
+﻿using HGV.Eaglesong;
 using HGV.Eaglesong.Dto;
 using HGV.Eaglesong.Services;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
@@ -60,19 +59,17 @@ namespace HGV.Eaglesong
                 {
                     var provider = sp.GetRequiredService<IAsyncCacheProvider<HttpResponseMessage>>();
                     var policy = Policy.CacheAsync(provider, TimeSpan.FromMinutes(60));                
-                    registry.Add("DatdotaPolicy", policy);
+                    registry.Add("WindrunaPolicy", policy);
                 }
                 return registry;
             });
 
-            builder.Services.AddHttpClient("Datdota", client =>
+            builder.Services.AddHttpClient("Windrun", client =>
             {
-                client.BaseAddress = new Uri("https://abilitydraft.datdota.com/api/");
+                client.BaseAddress = new Uri("https://windrun.io/api/");
             })
-            .AddPolicyHandlerFromRegistry("DatdotaPolicy");
+            .AddPolicyHandlerFromRegistry("WindrunaPolicy");
 
-            builder.Services.AddSingleton<ISteamKeyProvider, SteamKeyProvider>();
-            builder.Services.AddSingleton<IDotaApiClient, DotaApiClient>();
             builder.Services.AddSingleton<IPlayerService, PlayerService>();
         }
     }

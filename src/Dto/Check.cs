@@ -5,15 +5,12 @@ using System.Text;
 
 namespace HGV.Eaglesong.Dto
 {
-    public class Profile
+    public class Check
     {
         [JsonProperty("account_id")]
         public uint AccountId { get; set; }
 
-        [JsonProperty("persona")]
-        public string Persona { get; set; }
-
-        [JsonProperty("avatar")]
-        public string Avatar { get; set; }
+        [JsonProperty("steam_id")]
+        public ulong SteamId { get; set; }
     }
 }

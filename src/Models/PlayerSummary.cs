@@ -9,7 +9,7 @@ namespace HGV.Eaglesong.Models
     public class PlayerSummary
     {
         [JsonProperty("account_id")]
-        public int AccountId { get; set; }
+        public uint AccountId { get; set; }
 
         [JsonProperty("steam_id")]
         public ulong SteamId { get; set; }
@@ -24,7 +24,7 @@ namespace HGV.Eaglesong.Models
         public int? OverallRank { get; set; } 
 
         [JsonProperty("rating")]
-        public double Rating { get; set; } 
+        public double? Rating { get; set; } 
 
         [JsonProperty("region")]
         public string Region { get; set; } 
