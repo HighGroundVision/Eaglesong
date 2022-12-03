@@ -8,7 +8,7 @@ namespace HGV.Eaglesong.Models
     public class PlayerHistory
     {
         [JsonProperty("match_id")]
-        public long MatchId { get; set; }
+        public ulong MatchId { get; set; }
 
         [JsonProperty("when")]
         public int When { get; set; }

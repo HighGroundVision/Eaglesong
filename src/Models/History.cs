@@ -60,7 +60,7 @@ namespace HGV.Eaglesong.Models.DatDota
         public double Rating { get; set; }
 
         [JsonProperty("steamId")]
-        public int SteamId { get; set; }
+        public long SteamId { get; set; }
 
         [JsonProperty("topX")]
         public int? TopX { get; set; }
@@ -102,7 +102,7 @@ namespace HGV.Eaglesong.Models.DatDota
         public List<IgnoredSpell> IgnoredSpells { get; set; }
 
         [JsonProperty("matchId")]
-        public uint MatchId { get; set; }
+        public ulong MatchId { get; set; }
 
         [JsonProperty("picks")]
         public List<Pick> Picks { get; set; }

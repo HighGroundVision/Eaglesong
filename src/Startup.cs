@@ -58,7 +58,7 @@ namespace HGV.Eaglesong
                 var registry = new PolicyRegistry();
                 {
                     var provider = sp.GetRequiredService<IAsyncCacheProvider<HttpResponseMessage>>();
-                    var policy = Policy.CacheAsync(provider, TimeSpan.FromMinutes(60));                
+                    var policy = Policy.CacheAsync(provider, TimeSpan.FromMinutes(1));                
                     registry.Add("WindrunaPolicy", policy);
                 }
                 return registry;

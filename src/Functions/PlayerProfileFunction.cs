@@ -26,7 +26,7 @@ namespace HGV.Eaglesong
 
         [FunctionName("CheckIdentity")]
         public async Task<IActionResult> Check(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "check/{identity}")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "Get", Route = "check/{identity}")] HttpRequest req,
             string identity,
             ILogger log)
         {
@@ -89,7 +89,7 @@ namespace HGV.Eaglesong
 
         [FunctionName("PlayerProfile")]
         public async Task<IActionResult> Profile(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "profile/{account}")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "Get", Route = "profile/{account}")] HttpRequest req,
             uint account,
             ILogger log)
         {
@@ -115,7 +115,7 @@ namespace HGV.Eaglesong
 
         [FunctionName("PlayerDetails")]
         public async Task<IActionResult> Details(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "details/{account}")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "Get", Route = "details/{account}")] HttpRequest req,
             uint account,
             ILogger log)
         {
